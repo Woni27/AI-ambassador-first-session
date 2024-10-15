@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Acculturation Progress</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #003264, #6F0353, #BA0C2F, #C30064);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            font-weight: bold;
+        }
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .page.active {
+            opacity: 1;
+        }
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        p {
+            font-size: 1.4em;
+            max-width: 80%;
+            margin: 10px 0;
+        }
+        .progress-item {
+            font-size: 3em;
+            margin: 20px 0;
+            color: #FFD700;
+            font-family: 'Arial Black', sans-serif;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.6);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .progress-item.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        #nextBtn, #restartBtn, #musicToggle {
+            padding: 12px 24px;
+            font-size: 1.2em;
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        #nextBtn:hover, #restartBtn:hover, #musicToggle:hover {
+            background-color: rgba(255,255,255,0.4);
+        }
+        .star {
+            position: absolute;
+            font-size: 10px;
+            pointer-events: none;
+            animation: twinkle 1s infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .progress-bar {
+            width: 0%;
+            height: 5px;
+            background-color: #FFD700;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            transition: width 0.5s;
+            box-shadow: 0 0 10px #FFD700;
+        }
+        .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="page1" class="page active">
+        <h1>Let's see our progress of AI acculturation in our company</h1>
+        <p>Click anywhere to start the journey!</p>
+        <div class="icon">🤖</div>
+    </div>
+    <div id="page2" class="page">
+        <div class="icon">👨‍🏫</div>
+        <h1>Management Education</h1>
+        <p>Managers educated on AI</p>
+        <p class="progress-item">200+</p>
+    </div>
+    <div id="page3" class="page">
+        <div class="icon">👥</div>
+        <h1>Deep Dive Sessions</h1>
+        <p>Teams</p>
+        <p class="progress-item">5</p>
+        <p>Countries</p>
+        <p class="progress-item">10</p>
+    </div>
+    <div id="page4" class="page">
+        <div class="icon">💡</div>
+        <h1>AI Wish List</h1>
+        <p>AI for business ideas</p>
+        <p class="progress-item">27</p>
+    </div>
+    <div id="page5" class="page">
+        <div class="icon">📅</div>
+        <h1>AI Acculturation Events</h1>
+        <p>Events held</p>
+        <p class="progress-item">7</p>
+        <p>More to come in the future!</p>
+    </div>
+    <div id="page6" class="page">
+        <div class="icon">🕴️</div>
+        <h1>AI Ambassadors</h1>
+        <p>AI ambassadors nominated</p>
+        <p class="progress-item">15</p>
+        <p>From countries and departments in headquarters</p>
+    </div>
+    <div id="page7" class="page">
+        <div class="icon">🚀</div>
+        <h1>Join us for an exciting adventure of AI</h1>
+        <p>Play with AI to see how it could add value for our business</p>
+        <button id="restartBtn">Restart Presentation</button>
+    </div>
+    <div class="progress-bar"></div>
+    <button id="musicToggle" style="position: fixed; top: 20px; right: 20px;">🔇 Music Off</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script>
+        const pages = document.querySelectorAll('.page');
+        let currentPage = 0;
+        const progressBar = document.querySelector('.progress-bar');
+        const musicToggle = document.getElementById('musicToggle');
+        const audio = new Audio('background-music.mp3');
+        audio.loop = true;
+        let isMusicPlaying = false;
+
+        function showPage(index) {
+            pages[currentPage].classList.remove('active');
+            pages[index].classList.add('active');
+            currentPage = index;
+            updateProgressBar();
+            showProgressItem();
+        }
+
+        function nextPage() {
+            if (currentPage < pages.length - 1) {
+                showPage(currentPage + 1);
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = (currentPage / (pages.length - 1)) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function showProgressItem() {
+            const progressItem = pages[currentPage].querySelector('.progress-item');
+            if (progressItem) {
+                setTimeout(() => {
+                    progressItem.classList.add('visible');
+                }, 500);
+            }
+        }
+
+        document.body.addEventListener('click', nextPage);
+
+        document.getElementById('restartBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            showPage(0);
+            document.querySelectorAll('.progress-item').forEach(item => {
+                item.classList.remove('visible');
+            });
+        });
+
+        musicToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isMusicPlaying) {
+                audio.pause();
+                musicToggle.textContent = '🔇 Music Off';
+            } else {
+                audio.play().catch(error => {
+                    console.error('Error playing audio:', error);
+                    alert('Unable to play audio. Please ensure the background-music.mp3 file is in the same directory as this HTML file.');
+                });
+                musicToggle.textContent = '🔊 Music On';
+            }
+            isMusicPlaying = !isMusicPlaying;
+        });
+
+        function createStar() {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.textContent = '⭐';
+            star.style.left = `${Math.random() * 100}vw`;
+            star.style.top = '-10px';
+            document.body.appendChild(star);
+
+            gsap.to(star, {
+                y: '100vh',
+                x: `${(Math.random() - 0.5) * 200}px`,
+                rotation: Math.random() * 360,
+                duration: Math.random() * 3 + 3,
+                ease: 'power1.in',
+                onComplete: () => {
+                    document.body.removeChild(star);
+                }
+            });
+        }
+
+        setInterval(createStar, 200);
+
+        showProgressItem();
+    </script>
+</body>
+</html>
